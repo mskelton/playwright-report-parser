@@ -88,8 +88,6 @@ export class PlaywrightReportParser {
     )
 
     const zip = new AdmZip(zipBuffer)
-    console.log(zip.getEntries().map((e) => e.entryName))
-
     const traceEntry = zip.getEntry('test.trace')
     if (!traceEntry) {
       return null
