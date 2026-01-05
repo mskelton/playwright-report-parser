@@ -1,8 +1,21 @@
 {
   "name": "playwright-report-parser",
+  "description": "A lightweight TypeScript library to programmatically parse and analyze Playwright HTML test reports.",
   "version": "0.0.0-semantically-released",
+  "repository": "https://github.com/mskelton/playwright-report-parser",
+  "author": "Mark Skelton <mark@mskelton.dev>",
+  "license": "ISC",
   "packageManager": "yarn@4.12.0",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "format": "prettier --write .",
