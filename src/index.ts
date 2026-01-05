@@ -1,6 +1,13 @@
 import AdmZip from 'adm-zip'
 import { readFile } from 'fs/promises'
-import type { FailingTest, PlaywrightReport, TestFile } from './types.js'
+import type {
+  FailingTest,
+  HTMLReport,
+  TestFile,
+  TestResult,
+  Trace,
+} from './types/index.js'
+import { dirname, join } from 'node:path'
 
 export class PlaywrightReportParser {
   #htmlPath: string
@@ -35,17 +42,16 @@ export class PlaywrightReportParser {
     this.#zip = new AdmZip(buffer)
   }
 
-  getReport(): PlaywrightReport {
-    const reportJson = this.#getZipEntry('report.json')
-
-    if (!reportJson) {
+  getReport(): HTMLReport {
+    const entry = this.#getZipEntry('report.json')
+    if (!entry) {
       throw new Error('Could not find report.json in ZIP')
     }
 
-    return JSON.parse(reportJson)
+    return JSON.parse(entry.toString('utf-8'))
   }
 
-  getFailingTests(report: PlaywrightReport): FailingTest[] {
+  getFailingTests(report: HTMLReport): FailingTest[] {
     const failingTests: FailingTest[] = []
 
     for (const file of report.files) {
@@ -71,31 +77,51 @@ export class PlaywrightReportParser {
     return failingTests
   }
 
-  getTraceAttachments(result: {
-    attachments: Array<{ name: string; path: string }>
-  }): string[] {
-    return result.attachments
-      .filter((a) => a.name === 'trace')
-      .map((a) => a.path)
+  async getTrace(result: TestResult): Promise<Trace | null> {
+    const attachment = result.attachments.find((a) => a.name === 'trace')
+    if (!attachment) {
+      return null
+    }
+
+    const zipBuffer = await readFile(
+      join(dirname(this.#htmlPath), attachment.path ?? ''),
+    )
+
+    const zip = new AdmZip(zipBuffer)
+    console.log(zip.getEntries().map((e) => e.entryName))
+
+    const traceEntry = zip.getEntry('test.trace')
+    if (!traceEntry) {
+      return null
+    }
+
+    const traceBuffer = traceEntry.getData()
+    const trace = traceBuffer
+      .toString('utf-8')
+      .split('\n')
+      .map((line) => JSON.parse(line))
+
+    return {
+      events: trace,
+    }
   }
 
-  #getZipEntry(filename: string): string | null {
+  #getZipEntry(filename: string): Buffer | null {
     const entry = this.#zip.getEntry(filename)
 
     if (!entry) {
       return null
     }
 
-    return entry.getData().toString('utf-8')
+    return entry.getData()
   }
 
   #getTestFileDetails(fileId: string): TestFile | null {
-    const content = this.#getZipEntry(`${fileId}.json`)
-
-    if (!content) {
+    const entry = this.#getZipEntry(`${fileId}.json`)
+    if (!entry) {
       return null
     }
 
-    return JSON.parse(content)
+    return JSON.parse(entry.toString('utf-8'))
   }
 }
