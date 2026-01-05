@@ -5,6 +5,9 @@
   "repository": "https://github.com/mskelton/playwright-report-parser",
   "author": "Mark Skelton <mark@mskelton.dev>",
   "license": "ISC",
+  "publishConfig": {
+    "access": "public"
+  },
   "packageManager": "yarn@4.12.0",
   "type": "module",
   "exports": {
@@ -27,8 +30,6 @@
     "adm-zip": "^0.5.16"
   },
   "devDependencies": {
-    "@anolilab/semantic-release-clean-package-json": "^4.2.2",
-    "@mskelton/semantic-release-config": "^1.0.1",
     "@playwright/test": "^1.48.2",
     "@types/adm-zip": "^0.5.7",
     "@types/node": "^22.7.9",
