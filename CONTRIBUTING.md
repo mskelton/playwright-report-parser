@@ -12,3 +12,11 @@ yarn test
 
 Tests spawn child Playwright processes, generate real HTML reports, and verify
 the parser extracts data correctly.
+
+## Releasing
+
+To release a new version with semantic-release, run the following command.
+
+```bash
+gh workflow run release.yml
+```
