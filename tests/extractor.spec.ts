@@ -2,6 +2,7 @@ import { PlaywrightReportParser } from '../src/index.js'
 import dedent from 'dedent'
 import { expect, test } from './fixtures.js'
 import { stripVTControlCharacters } from 'node:util'
+import { StdioTraceEvent } from '../src/types/trace.js'
 
 test('extracts report statistics', async ({ runInlineTest }) => {
   const result = await runInlineTest({
@@ -216,4 +217,116 @@ test('handles multiple errors in one test', async ({ runInlineTest }) => {
 
   expect(failingTests).toHaveLength(1)
   expect(failingTests[0].result.errors!.length).toBe(3)
+})
+
+test('extracts error context', async ({ runInlineTest }) => {
+  const result = await runInlineTest({
+    'a.test.ts': `
+      import { test, expect } from '@playwright/test';
+      test('error context test', async ({ page }) => {
+        await page.setContent('<h1>Error Context Test</h1>');
+        expect(1).toBe(2);
+      });
+    `,
+  })
+
+  expect(result.exitCode).toBe(1)
+
+  const parser = await PlaywrightReportParser.parse(result.reportPath)
+  const failingTests = parser.getFailingTests(parser.getReport())
+  expect(failingTests).toHaveLength(1)
+
+  const errorContext = parser.getErrorContext(failingTests[0].result)
+  expect(errorContext).toBeDefined()
+
+  const buffer = await errorContext!.read()
+  expect(buffer).not.toBeNull()
+  expect(buffer!.length).toBeGreaterThan(0)
+
+  const content = buffer!.toString('utf-8')
+  expect(content).toContain('# Page snapshot')
+  expect(content).toContain('Error Context Test')
+})
+
+test('extracts screenshots', async ({ runInlineTest }) => {
+  const result = await runInlineTest({
+    'a.test.ts': `
+      import { test, expect } from '@playwright/test';
+      test('screenshot test', async ({ page }) => {
+        await page.setContent('<h1>Screenshot Test</h1>');
+        expect(1).toBe(2);
+      });
+    `,
+  })
+
+  expect(result.exitCode).toBe(1)
+
+  const parser = await PlaywrightReportParser.parse(result.reportPath)
+  const failingTests = parser.getFailingTests(parser.getReport())
+  expect(failingTests).toHaveLength(1)
+
+  const attachments = parser.getScreenshots(failingTests[0].result)
+  expect(attachments).toHaveLength(1)
+
+  // Read and verify PNG binary data
+  const buffer = await attachments[0].read()
+  expect(buffer).not.toBeNull()
+  expect(buffer!.length).toBeGreaterThan(0)
+
+  // PNG magic bytes: 0x89 0x50 0x4E 0x47 (‰PNG)
+  expect(buffer![0]).toBe(0x89)
+  expect(buffer![1]).toBe(0x50) // P
+  expect(buffer![2]).toBe(0x4e) // N
+  expect(buffer![3]).toBe(0x47) // G
+})
+
+test('extracts trace actions', async ({ runInlineTest }) => {
+  const result = await runInlineTest({
+    'a.test.ts': `
+      import { test, expect } from '@playwright/test';
+      test('trace test', async ({ page }) => {
+        console.log('test output message');
+        await page.setContent('<button id="btn">Click me</button>');
+        await page.locator('#btn').click();
+        await expect(page.locator('button')).toHaveText('Wrong Text');
+      });
+    `,
+  })
+
+  expect(result.exitCode).toBe(1)
+
+  const parser = await PlaywrightReportParser.parse(result.reportPath)
+  const failingTests = parser.getFailingTests(parser.getReport())
+  expect(failingTests).toHaveLength(1)
+
+  const trace = await parser.getTrace(failingTests[0].result)
+  expect(trace).toBeDefined()
+
+  const beforeEvents = trace!.events.filter((e) => e.type === 'before')
+  expect(beforeEvents.length).toBeGreaterThan(0)
+
+  await test.step('extracts click action', async () => {
+    const clickAction = beforeEvents.find((e) =>
+      e.title?.toLowerCase().includes('locator'),
+    )
+    expect(clickAction).toBeDefined()
+  })
+
+  await test.step('extracts toHaveText action', async () => {
+    const expectAction = beforeEvents.find((e) =>
+      e.title?.includes('toHaveText'),
+    )
+    expect(expectAction).toBeDefined()
+  })
+
+  await test.step('extracts stdout', async () => {
+    const stdoutEvents = trace!.events.filter(
+      (event): event is StdioTraceEvent => event.type === 'stdout',
+    )
+    expect(stdoutEvents.length).toBeGreaterThan(0)
+    const outputMessage = stdoutEvents.find((e) =>
+      e.text?.includes('test output message'),
+    )
+    expect(outputMessage).toBeDefined()
+  })
 })

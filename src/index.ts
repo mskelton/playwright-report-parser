@@ -2,8 +2,9 @@ import AdmZip from 'adm-zip'
 import { readFile } from 'fs/promises'
 import type {
   FailingTest,
+  FileInfo,
   HTMLReport,
-  TestFile,
+  LazyTestAttachment,
   TestResult,
   Trace,
 } from './types/index.js'
@@ -55,13 +56,14 @@ export class PlaywrightReportParser {
     const failingTests: FailingTest[] = []
 
     for (const file of report.files) {
-      const fileDetails = this.#getTestFileDetails(file.fileId)
-
+      const fileDetails = this.#getZipEntry(`${file.fileId}.json`)
       if (!fileDetails) {
         continue
       }
 
-      for (const test of fileDetails.tests) {
+      const { tests } = JSON.parse(fileDetails.toString('utf-8'))
+
+      for (const test of tests) {
         for (const result of test.results) {
           if (result.status === 'failed' || result.status === 'timedOut') {
             failingTests.push({
@@ -83,12 +85,13 @@ export class PlaywrightReportParser {
       return null
     }
 
-    const zipBuffer = await readFile(
-      join(dirname(this.#htmlPath), attachment.path ?? ''),
-    )
+    const traceZipBuffer = await this.#readFile(attachment)
+    if (!traceZipBuffer) {
+      return null
+    }
 
-    const zip = new AdmZip(zipBuffer)
-    const traceEntry = zip.getEntry('test.trace')
+    const traceZip = new AdmZip(traceZipBuffer)
+    const traceEntry = traceZip.getEntry('test.trace')
     if (!traceEntry) {
       return null
     }
@@ -104,6 +107,28 @@ export class PlaywrightReportParser {
     }
   }
 
+  getScreenshots(result: TestResult): LazyTestAttachment[] {
+    return this.#getAttachments(result).filter(
+      (attachment) => attachment.name === 'screenshot',
+    )
+  }
+
+  getErrorContext(result: TestResult): LazyTestAttachment | null {
+    const attachment = this.#getAttachments(result).find(
+      (attachment) => attachment.name === 'error-context',
+    )
+
+    return attachment ?? null
+  }
+
+  #getAttachments(result: TestResult): LazyTestAttachment[] {
+    return result.attachments.map((attachment) => ({
+      name: attachment.name,
+      contentType: attachment.contentType,
+      read: (): Promise<Buffer | null> => this.#readFile(attachment),
+    }))
+  }
+
   #getZipEntry(filename: string): Buffer | null {
     const entry = this.#zip.getEntry(filename)
 
@@ -114,12 +139,17 @@ export class PlaywrightReportParser {
     return entry.getData()
   }
 
-  #getTestFileDetails(fileId: string): TestFile | null {
-    const entry = this.#getZipEntry(`${fileId}.json`)
-    if (!entry) {
-      return null
+  #readFile(fileInfo: FileInfo): Promise<Buffer | null> {
+    // Handle base64-encoded body
+    if (fileInfo.body) {
+      return Promise.resolve(Buffer.from(fileInfo.body, 'base64'))
     }
 
-    return JSON.parse(entry.toString('utf-8'))
+    // Handle path-based attachments (stored on disk relative to report)
+    if (fileInfo.path) {
+      return readFile(join(dirname(this.#htmlPath), fileInfo.path))
+    }
+
+    return Promise.resolve(null)
   }
 }

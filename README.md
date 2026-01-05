@@ -46,6 +46,14 @@ for (const { test, result } of failingTests) {
   for (const event of trace?.events ?? []) {
     console.log(`   📹 ${event.type}: ${event.message}`)
   }
+
+  const screenshots = parser.getScreenshots(result)
+  for (const screenshot of screenshots) {
+    console.log(`   📸 ${screenshot.name}`)
+  }
+
+  const errorContext = parser.getErrorContext(result)
+  console.log(`   🔍 ${errorContext.name}`)
 }
 ```
 
