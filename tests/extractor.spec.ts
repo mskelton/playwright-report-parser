@@ -1,5 +1,7 @@
 import { PlaywrightReportParser } from '../src/index.js'
+import dedent from 'dedent'
 import { expect, test } from './fixtures.js'
+import { stripVTControlCharacters } from 'node:util'
 
 test('extracts report statistics', async ({ runInlineTest }) => {
   const result = await runInlineTest({
@@ -138,9 +140,16 @@ test('extracts trace file paths', async ({ runInlineTest }) => {
   expect(failingTests).toHaveLength(1)
 
   const trace = await parser.getTrace(failingTests[0].result)
-  console.log(trace)
-  // expect(traces.length).toBeGreaterThan(0)
-  // expect(traces[0]).toMatch(/data\/.*\.zip$/)
+  expect(trace).toBeDefined()
+
+  const error = trace?.events.find((e) => e.type === 'error')
+  expect(error).toBeDefined()
+  expect(stripVTControlCharacters(error!.message)).toBe(dedent`
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 2
+    Received: 1
+  `)
 })
 
 test('handles tests with retries', async ({ runInlineTest }) => {
