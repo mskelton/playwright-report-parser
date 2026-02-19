@@ -55,6 +55,34 @@ for (const { test, result } of failingTests) {
 }
 ```
 
+### CLI Usage
+
+All commands output JSON to stdout. Errors are JSON to stderr with exit code 1.
+
+```bash
+# Get report statistics
+npx playwright-report-parser get-stats --report ./playwright-report
+
+# List all test files with per-file statistics
+npx playwright-report-parser get-files --report ./playwright-report
+
+# Get all failing tests with error messages and result IDs
+npx playwright-report-parser get-failures --report ./playwright-report
+
+# Get trace events for a specific test result
+npx playwright-report-parser get-traces --report ./playwright-report --result-id abc123x0
+
+# Save screenshots for a specific test result
+npx playwright-report-parser get-screenshots --report ./playwright-report --result-id abc123x0 --output ./debug
+
+# Get error context attachment for a specific test result
+npx playwright-report-parser get-error-context --report ./playwright-report --result-id abc123x0
+```
+
+The `--report` flag accepts either a directory (resolves to `index.html` inside
+it) or a direct path to the HTML file. The `--result-id` flag uses the format
+`{testId}x{retry}` as returned by `get-failures`.
+
 ## How It Works
 
 Playwright's HTML reports are self-contained React apps that embed all test data

@@ -37,7 +37,7 @@ Commands:
 
 Options:
   --report <path>      Path to Playwright HTML report (file or directory)
-  --result-id <id>     Result ID in format {testId}_{retry} (for per-result commands)
+  --result-id <id>     Result ID from get-failures (for per-result commands)
   --output <dir>       Output directory for screenshots (default: ./screenshots)
   --help               Show this help message
 
@@ -46,9 +46,9 @@ All output is JSON to stdout. Errors are JSON to stderr with exit code 1.
 Example workflow:
   playwright-report-parser get-stats --report ./report
   playwright-report-parser get-failures --report ./report
-  playwright-report-parser get-traces --report ./report --result-id abc123_0
-  playwright-report-parser get-screenshots --report ./report --result-id abc123_0 --output ./debug
-  playwright-report-parser get-error-context --report ./report --result-id abc123_0
+  playwright-report-parser get-traces --report ./report --result-id abc123x0
+  playwright-report-parser get-screenshots --report ./report --result-id abc123x0 --output ./debug
+  playwright-report-parser get-error-context --report ./report --result-id abc123x0
 `
 
 function fail(message: string): never {
@@ -66,9 +66,9 @@ function resolveReportPath(reportPath: string): string {
 }
 
 function parseResultId(resultId: string): { retry: number; testId: string } {
-  const i = resultId.lastIndexOf('_')
+  const i = resultId.lastIndexOf('x')
   if (i === -1) {
-    fail(`Invalid result ID format: "${resultId}". Expected format: {testId}_{retry}`)
+    fail(`Invalid result ID format: "${resultId}". Expected format: {testId}x{retry}`)
   }
 
   const testId = resultId.slice(0, i)
@@ -140,7 +140,7 @@ async function getFailures(parser: PlaywrightReportParser) {
     location: ft.test.location,
     path: ft.test.path,
     projectName: ft.test.projectName,
-    resultId: `${ft.test.testId}_${ft.result.retry}`,
+    resultId: `${ft.test.testId}x${ft.result.retry}`,
     retry: ft.result.retry,
     status: ft.result.status,
     tags: ft.test.tags,

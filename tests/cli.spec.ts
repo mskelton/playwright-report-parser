@@ -177,7 +177,7 @@ test.describe('get-failures', () => {
         },
         path: expect.any(Array),
         projectName: expect.any(String),
-        resultId: expect.stringMatching(/.+_0$/),
+        resultId: expect.stringMatching(/.+x0$/),
         retry: 0,
         status: 'failed',
         tags: [],
