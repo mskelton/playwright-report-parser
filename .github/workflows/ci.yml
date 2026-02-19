@@ -9,17 +9,28 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 'lts/*'
+
       - name: Install dependencies
         run: yarn install --immutable
+
       - name: Check formatting
         run: yarn format:check
+
       - name: Typecheck
         run: yarn typecheck
+
+      - name: Build
+        run: yarn build
+
       - name: Install Playwright
         run: yarn playwright install --with-deps chromium
+
       - name: Tests
         run: yarn test
