@@ -1,132 +1,132 @@
-import type { FrameSnapshot, ResourceSnapshot } from './snapshot'
-import type { Language } from './locatorGenerators'
 import type { Point, SerializedError, StackFrame } from './channels'
+import type { Language } from './locatorGenerators'
+import type { FrameSnapshot, ResourceSnapshot } from './snapshot'
 
-export type Size = { width: number; height: number }
+export type Size = { height: number; width: number }
 
 // Make sure you add _modernize_N_to_N1(event: any) to traceModernizer.ts.
 export type VERSION = 8
 
 export type BrowserContextEventOptions = {
   baseURL?: string
-  viewport?: Size
   deviceScaleFactor?: number
   isMobile?: boolean
   userAgent?: string
+  viewport?: Size
 }
 
 export type ContextCreatedTraceEvent = {
-  version: number
-  type: 'context-options'
-  origin: 'testRunner' | 'library'
   browserName: string
   channel?: string
-  platform: string
-  wallTime: number
+  contextId?: string
   monotonicTime: number
-  title?: string
   options: BrowserContextEventOptions
+  origin: 'library' | 'testRunner'
+  platform: string
   sdkLanguage?: Language
   testIdAttributeName?: string
-  contextId?: string
+  title?: string
+  type: 'context-options'
+  version: number
+  wallTime: number
 }
 
 export type ScreencastFrameTraceEvent = {
-  type: 'screencast-frame'
+  frameSwapWallTime?: number
+  height: number
   pageId: string
   sha1: string
-  width: number
-  height: number
   timestamp: number
-  frameSwapWallTime?: number
+  type: 'screencast-frame'
+  width: number
 }
 
 export type BeforeActionTraceEvent = {
-  type: 'before'
-  callId: string
-  startTime: number
-  title?: string
-  class: string
-  method: string
-  params: Record<string, any>
-  stepId?: string
   beforeSnapshot?: string
-  stack?: StackFrame[]
-  pageId?: string
-  parentId?: string
+  callId: string
+  class: string
   group?: string
+  method: string
+  pageId?: string
+  params: Record<string, any>
+  parentId?: string
+  stack?: StackFrame[]
+  startTime: number
+  stepId?: string
+  title?: string
+  type: 'before'
 }
 
 export type InputActionTraceEvent = {
-  type: 'input'
   callId: string
   inputSnapshot?: string
   point?: Point
+  type: 'input'
 }
 
 export type AfterActionTraceEventAttachment = {
-  name: string
+  base64?: string
   contentType: string
+  name: string
   path?: string
   sha1?: string
-  base64?: string
 }
 
 export type AfterActionTraceEventAnnotation = {
-  type: string
   description?: string
+  type: string
 }
 
 export type AfterActionTraceEvent = {
-  type: 'after'
+  afterSnapshot?: string
+  annotations?: AfterActionTraceEventAnnotation[]
+  attachments?: AfterActionTraceEventAttachment[]
   callId: string
   endTime: number
-  afterSnapshot?: string
   error?: SerializedError['error']
-  attachments?: AfterActionTraceEventAttachment[]
-  annotations?: AfterActionTraceEventAnnotation[]
-  result?: any
   point?: Point
+  result?: any
+  type: 'after'
 }
 
 export type LogTraceEvent = {
-  type: 'log'
   callId: string
-  time: number
   message: string
+  time: number
+  type: 'log'
 }
 
 export type EventTraceEvent = {
-  type: 'event'
-  time: number
   class: string
   method: string
-  params: any
   pageId?: string
+  params: any
+  time: number
+  type: 'event'
 }
 
 export type ConsoleMessageTraceEvent = {
-  type: 'console'
-  time: number
-  pageId?: string
-  messageType: string
-  text: string
   args?: { preview: string; value: any }[]
   location: {
-    url: string
-    lineNumber: number
     columnNumber: number
+    lineNumber: number
+    url: string
   }
+  messageType: string
+  pageId?: string
+  text: string
+  time: number
+  type: 'console'
 }
 
 export type ResourceSnapshotTraceEvent = {
-  type: 'resource-snapshot'
   snapshot: ResourceSnapshot
+  type: 'resource-snapshot'
 }
 
 export type FrameSnapshotTraceEvent = {
-  type: 'frame-snapshot'
   snapshot: FrameSnapshot
+  type: 'frame-snapshot'
 }
 
 export type ActionTraceEvent = {
@@ -136,16 +136,16 @@ export type ActionTraceEvent = {
   Omit<InputActionTraceEvent, 'type'>
 
 export type StdioTraceEvent = {
-  type: 'stdout' | 'stderr'
-  timestamp: number
-  text?: string
   base64?: string
+  text?: string
+  timestamp: number
+  type: 'stderr' | 'stdout'
 }
 
 export type ErrorTraceEvent = {
-  type: 'error'
   message: string
   stack?: StackFrame[]
+  type: 'error'
 }
 
 export type TraceEvent =

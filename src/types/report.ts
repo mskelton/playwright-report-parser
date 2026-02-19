@@ -1,40 +1,40 @@
-import type { TestAnnotation, Metadata } from '@playwright/test'
+import type { Metadata, TestAnnotation } from '@playwright/test'
 
 export type Stats = {
-  total: number
   expected: number
-  unexpected: number
   flaky: number
-  skipped: number
   ok: boolean
+  skipped: number
+  total: number
+  unexpected: number
 }
 
 export type FilteredStats = {
-  total: number
   duration: number
+  total: number
 }
 
 export type Location = {
+  column: number
   file: string
   line: number
-  column: number
 }
 
 export type HTMLReportOptions = {
-  title?: string
   noCopyPrompt?: boolean
   noSnippets?: boolean
+  title?: string
 }
 
 export type HTMLReport = {
-  metadata: Metadata
+  duration: number
+  errors: string[]
   files: TestFileSummary[]
-  stats: Stats
+  metadata: Metadata
+  options: HTMLReportOptions
   projectNames: string[]
   startTime: number
-  duration: number
-  errors: string[] // Top-level errors that are not attributed to any test.
-  options: HTMLReportOptions
+  stats: Stats
 }
 
 export type TestFile = {
@@ -46,26 +46,26 @@ export type TestFile = {
 export type TestFileSummary = {
   fileId: string
   fileName: string
-  tests: TestCaseSummary[]
   stats: Stats
+  tests: TestCaseSummary[]
 }
 
 export type TestCaseSummary = {
-  testId: string
-  title: string
+  annotations: TestAnnotation[]
+  duration: number
+  location: Location
+  ok: boolean
+  outcome: 'expected' | 'flaky' | 'skipped' | 'unexpected'
   path: string[]
   projectName: string
-  location: Location
-  annotations: TestAnnotation[]
-  tags: string[]
-  outcome: 'skipped' | 'expected' | 'unexpected' | 'flaky'
-  duration: number
-  ok: boolean
   results: TestResultSummary[]
+  tags: string[]
+  testId: string
+  title: string
 }
 
 export type TestResultSummary = {
-  attachments: { name: string; contentType: string; path?: string }[]
+  attachments: { contentType: string; name: string; path?: string }[]
 }
 
 export type TestCase = Omit<TestCaseSummary, 'results'> & {
@@ -73,32 +73,32 @@ export type TestCase = Omit<TestCaseSummary, 'results'> & {
 }
 
 export type TestAttachment = {
-  name: string
   body?: string
-  path?: string
   contentType: string
+  name: string
+  path?: string
 }
 
 export type TestResult = {
+  annotations: TestAnnotation[]
+  attachments: TestAttachment[]
+  duration: number
+  errors: { codeframe?: string; message: string }[]
   retry: number
   startTime: string
-  duration: number
+  status: 'failed' | 'interrupted' | 'passed' | 'skipped' | 'timedOut'
   steps: TestStep[]
-  errors: { message: string; codeframe?: string }[]
-  attachments: TestAttachment[]
-  status: 'passed' | 'failed' | 'timedOut' | 'skipped' | 'interrupted'
-  annotations: TestAnnotation[]
 }
 
 export type TestStep = {
-  title: string
-  startTime: string
-  duration: number
-  location?: Location
-  snippet?: string
-  error?: string
-  steps: TestStep[]
   attachments: number[]
   count: number
+  duration: number
+  error?: string
+  location?: Location
   skipped?: boolean
+  snippet?: string
+  startTime: string
+  steps: TestStep[]
+  title: string
 }

@@ -6,10 +6,10 @@ export type Point = {
 }
 
 export type StackFrame = {
-  file: string
-  line: number
   column: number
+  file: string
   function?: string
+  line: number
 }
 
 export type SerializedError = {
@@ -22,43 +22,43 @@ export type SerializedError = {
 }
 
 export type SerializedValue = {
-  n?: number
+  a?: SerializedValue[]
   b?: boolean
-  s?: string
-  v?: 'null' | 'undefined' | 'NaN' | 'Infinity' | '-Infinity' | '-0'
-  d?: string
-  u?: string
   bi?: string
-  ta?: {
-    b: Binary
-    k:
-      | 'i8'
-      | 'ui8'
-      | 'ui8c'
-      | 'i16'
-      | 'ui16'
-      | 'i32'
-      | 'ui32'
-      | 'f32'
-      | 'f64'
-      | 'bi64'
-      | 'bui64'
-  }
+  d?: string
   e?: {
     m: string
     n: string
     s: string
   }
-  r?: {
-    p: string
-    f: string
-  }
-  a?: SerializedValue[]
+  h?: number
+  id?: number
+  n?: number
   o?: {
     k: string
     v: SerializedValue
   }[]
-  h?: number
-  id?: number
+  r?: {
+    f: string
+    p: string
+  }
   ref?: number
+  s?: string
+  ta?: {
+    b: Binary
+    k:
+      | 'bi64'
+      | 'bui64'
+      | 'f32'
+      | 'f64'
+      | 'i8'
+      | 'i16'
+      | 'i32'
+      | 'ui8'
+      | 'ui8c'
+      | 'ui16'
+      | 'ui32'
+  }
+  u?: string
+  v?: '-0' | '-Infinity' | 'Infinity' | 'NaN' | 'null' | 'undefined'
 }

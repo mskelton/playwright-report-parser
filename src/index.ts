@@ -1,5 +1,6 @@
 import AdmZip from 'adm-zip'
 import { readFile } from 'fs/promises'
+import { dirname, join } from 'node:path'
 import type {
   FailingTest,
   FileInfo,
@@ -8,7 +9,6 @@ import type {
   TestResult,
   Trace,
 } from './types/index.js'
-import { dirname, join } from 'node:path'
 
 export class PlaywrightReportParser {
   #htmlPath: string
@@ -67,9 +67,9 @@ export class PlaywrightReportParser {
         for (const result of test.results) {
           if (result.status === 'failed' || result.status === 'timedOut') {
             failingTests.push({
-              test,
-              result,
               fileId: file.fileId,
+              result,
+              test,
             })
           }
         }
@@ -123,8 +123,8 @@ export class PlaywrightReportParser {
 
   #getAttachments(result: TestResult): LazyTestAttachment[] {
     return result.attachments.map((attachment) => ({
-      name: attachment.name,
       contentType: attachment.contentType,
+      name: attachment.name,
       read: (): Promise<Buffer | null> => this.#readFile(attachment),
     }))
   }

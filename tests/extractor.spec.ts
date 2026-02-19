@@ -1,8 +1,8 @@
-import { PlaywrightReportParser } from '../src/index.js'
 import dedent from 'dedent'
-import { expect, test } from './fixtures.js'
 import { stripVTControlCharacters } from 'node:util'
+import { PlaywrightReportParser } from '../src/index.js'
 import { StdioTraceEvent } from '../src/types/trace.js'
+import { expect, test } from './fixtures.js'
 
 test('extracts report statistics', async ({ runInlineTest }) => {
   const result = await runInlineTest({
@@ -216,7 +216,7 @@ test('handles multiple errors in one test', async ({ runInlineTest }) => {
   const failingTests = parser.getFailingTests(parser.getReport())
 
   expect(failingTests).toHaveLength(1)
-  expect(failingTests[0].result.errors!.length).toBe(3)
+  expect(failingTests[0].result.errors!).toHaveLength(3)
 })
 
 test('extracts error context', async ({ runInlineTest }) => {

@@ -4,169 +4,169 @@ export type HARFile = {
 }
 
 export type Log = {
-  version: string
-  creator: Creator
   browser?: Browser
-  pages?: Page[]
-  entries: Entry[]
   comment?: string
+  creator: Creator
+  entries: Entry[]
+  pages?: Page[]
+  version: string
 }
 
 export type Creator = {
+  comment?: string
   name: string
   version: string
-  comment?: string
 }
 
 export type Browser = {
+  comment?: string
   name: string
   version: string
-  comment?: string
 }
 
 export type Page = {
-  startedDateTime: string
-  id: string
-  title: string
-  pageTimings: PageTimings
   comment?: string
+  id: string
+  pageTimings: PageTimings
+  startedDateTime: string
+  title: string
 }
 
 export type PageTimings = {
+  comment?: string
   onContentLoad?: number
   onLoad?: number
-  comment?: string
 }
 
 export type Entry = {
-  pageref?: string
-  startedDateTime: string
-  time: number
-  request: Request
-  response: Response
-  cache: Cache
-  timings: Timings
-  serverIPAddress?: string
-  connection?: string
+  _apiRequest?: boolean
   _frameref?: string
   _monotonicTime?: number
-  _serverPort?: number
   _securityDetails?: SecurityDetails
+  _serverPort?: number
   _wasAborted?: boolean
-  _wasFulfilled?: boolean
   _wasContinued?: boolean
-  _apiRequest?: boolean
+  _wasFulfilled?: boolean
+  cache: Cache
+  connection?: string
+  pageref?: string
+  request: Request
+  response: Response
+  serverIPAddress?: string
+  startedDateTime: string
+  time: number
+  timings: Timings
 }
 
 export type Request = {
-  method: string
-  url: string
-  httpVersion: string
-  cookies: Cookie[]
-  headers: Header[]
-  queryString: QueryParameter[]
-  postData?: PostData
-  headersSize: number
   bodySize: number
   comment?: string
+  cookies: Cookie[]
+  headers: Header[]
+  headersSize: number
+  httpVersion: string
+  method: string
+  postData?: PostData
+  queryString: QueryParameter[]
+  url: string
 }
 
 export type Response = {
-  status: number
-  statusText: string
-  httpVersion: string
-  cookies: Cookie[]
-  headers: Header[]
-  content: Content
-  redirectURL: string
-  headersSize: number
+  _failureText?: string
+  _transferSize?: number
   bodySize: number
   comment?: string
-  _transferSize?: number
-  _failureText?: string
+  content: Content
+  cookies: Cookie[]
+  headers: Header[]
+  headersSize: number
+  httpVersion: string
+  redirectURL: string
+  status: number
+  statusText: string
 }
 
 export type Cookie = {
-  name: string
-  value: string
-  path?: string
+  comment?: string
   domain?: string
   expires?: string
   httpOnly?: boolean
-  secure?: boolean
+  name: string
+  path?: string
   sameSite?: string
-  comment?: string
+  secure?: boolean
+  value: string
 }
 
 export type Header = {
+  comment?: string
   name: string
   value: string
-  comment?: string
 }
 
 export type QueryParameter = {
+  comment?: string
   name: string
   value: string
-  comment?: string
 }
 
 export type PostData = {
+  _file?: string
+  _sha1?: string
+  comment?: string
   mimeType: string
   params: Param[]
   text: string
-  comment?: string
-  _sha1?: string
-  _file?: string
 }
 
 export type Param = {
+  comment?: string
+  contentType?: string
+  fileName?: string
   name: string
   value?: string
-  fileName?: string
-  contentType?: string
-  comment?: string
 }
 
 export type Content = {
-  size: number
-  compression?: number
-  mimeType: string
-  text?: string
-  encoding?: string
-  comment?: string
-  _sha1?: string
   _file?: string
+  _sha1?: string
+  comment?: string
+  compression?: number
+  encoding?: string
+  mimeType: string
+  size: number
+  text?: string
 }
 
 export type Cache = {
-  beforeRequest?: CacheState | null
   afterRequest?: CacheState | null
+  beforeRequest?: CacheState | null
   comment?: string
 }
 
 export type CacheState = {
-  expires?: string
-  lastAccess: string
-  eTag: string
-  hitCount: number
   comment?: string
+  eTag: string
+  expires?: string
+  hitCount: number
+  lastAccess: string
 }
 
 export type Timings = {
   blocked?: number
-  dns?: number
-  connect?: number
-  send: number
-  wait: number
-  receive: number
-  ssl?: number
   comment?: string
+  connect?: number
+  dns?: number
+  receive: number
+  send: number
+  ssl?: number
+  wait: number
 }
 
 export type SecurityDetails = {
+  issuer?: string
   protocol?: string
   subjectName?: string
-  issuer?: string
   validFrom?: number
   validTo?: number
 }

@@ -153,7 +153,6 @@ Custom Playwright fixture that:
 
 - `@playwright/test` (^1.48.2) - Test runner AND testing target
 - `typescript` (^5.6.3) - Type checking and compilation
-- `tsx` (^4.19.1) - TypeScript execution
 - `execa` (^9.5.2) - Spawn child processes in tests
 - `prettier` (^3.6.2) - Code formatting
 

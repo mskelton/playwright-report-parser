@@ -18,30 +18,30 @@ export type NodeSnapshot =
   | NodeNameAttributesChildNodesSnapshot
 
 export type ResourceOverride = {
-  url: string
-  sha1?: string
   ref?: number
+  sha1?: string
+  url: string
 }
 
 export type FrameSnapshot = {
-  snapshotName?: string
   callId: string
-  pageId: string
-  frameId: string
-  frameUrl: string
-  timestamp: number
-  wallTime?: number
   collectionTime: number
   doctype?: string
+  frameId: string
+  frameUrl: string
   html: NodeSnapshot
-  resourceOverrides: ResourceOverride[]
-  viewport: { width: number; height: number }
   isMainFrame: boolean
+  pageId: string
+  resourceOverrides: ResourceOverride[]
+  snapshotName?: string
+  timestamp: number
+  viewport: { height: number; width: number }
+  wallTime?: number
 }
 
 export type RenderedFrameSnapshot = {
-  html: string
-  pageId: string
   frameId: string
+  html: string
   index: number
+  pageId: string
 }

@@ -13,22 +13,23 @@ type Params = {
 }
 
 type RunResult = {
+  didNotRun: number
   exitCode: number
-  output: string
-  stdout: string
-  stderr: string
-  rawOutput: string
-  passed: number
   failed: number
   flaky: number
-  skipped: number
   interrupted: number
-  didNotRun: number
-  reportPath: string
+  output: string
+  passed: number
+  rawOutput: string
   report: JSONReport
+  reportPath: string
+  skipped: number
+  stderr: string
+  stdout: string
 }
 
 const asciiRegex = new RegExp(
+  // eslint-disable-next-line no-control-regex
   '[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))',
   'g',
 )
@@ -86,7 +87,7 @@ function toParamList(params: Params): string[] {
   for (const key of Object.keys(params)) {
     const values = Array.isArray(params[key]) ? params[key] : [params[key]]
     for (const value of values) {
-      const k = key.startsWith('-') ? key : '--' + key
+      const k = key.startsWith('-') ? key : `--${  key}`
       paramList.push(params[key] === true ? k : `${k}=${value}`)
     }
   }
@@ -107,14 +108,14 @@ function parseTestRunnerOutput(output: string) {
   const strippedOutput = stripAnsi(output)
 
   return {
-    output: strippedOutput,
-    rawOutput: output,
-    passed: summary(/(\d+) passed/g),
+    didNotRun: summary(/(\d+) did not run/g),
     failed: summary(/(\d+) failed/g),
     flaky: summary(/(\d+) flaky/g),
-    skipped: summary(/(\d+) skipped/g),
     interrupted: summary(/(\d+) interrupted/g),
-    didNotRun: summary(/(\d+) did not run/g),
+    output: strippedOutput,
+    passed: summary(/(\d+) passed/g),
+    rawOutput: output,
+    skipped: summary(/(\d+) skipped/g),
   }
 }
 
@@ -145,11 +146,11 @@ async function runPlaywrightTest(
 
   return {
     exitCode: result.exitCode ?? 1,
-    stdout: result.stdout,
     stderr: result.stderr,
+    stdout: result.stdout,
     ...stats,
-    reportPath: path.join(baseDir, 'playwright-report', 'index.html'),
     report: report!,
+    reportPath: path.join(baseDir, 'playwright-report', 'index.html'),
   }
 }
 

@@ -1,1 +1,1 @@
-export type Language = 'javascript' | 'python' | 'java' | 'csharp' | 'jsonl'
+export type Language = 'csharp' | 'java' | 'javascript' | 'jsonl' | 'python'
