@@ -46,18 +46,7 @@ export type SerializedValue = {
   s?: string
   ta?: {
     b: Binary
-    k:
-      | 'bi64'
-      | 'bui64'
-      | 'f32'
-      | 'f64'
-      | 'i8'
-      | 'i16'
-      | 'i32'
-      | 'ui8'
-      | 'ui8c'
-      | 'ui16'
-      | 'ui32'
+    k: 'bi64' | 'bui64' | 'f32' | 'f64' | 'i8' | 'i16' | 'i32' | 'ui8' | 'ui8c' | 'ui16' | 'ui32'
   }
   u?: string
   v?: '-0' | '-Infinity' | 'Infinity' | 'NaN' | 'null' | 'undefined'

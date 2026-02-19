@@ -68,9 +68,7 @@ function resolveReportPath(reportPath: string): string {
 function parseResultId(resultId: string): { retry: number; testId: string } {
   const i = resultId.lastIndexOf('_')
   if (i === -1) {
-    fail(
-      `Invalid result ID format: "${resultId}". Expected format: {testId}_{retry}`,
-    )
+    fail(`Invalid result ID format: "${resultId}". Expected format: {testId}_{retry}`)
   }
 
   const testId = resultId.slice(0, i)
@@ -82,14 +80,9 @@ function parseResultId(resultId: string): { retry: number; testId: string } {
   return { retry, testId }
 }
 
-function findResult(
-  failingTests: FailingTest[],
-  resultId: string,
-): FailingTest {
+function findResult(failingTests: FailingTest[], resultId: string): FailingTest {
   const { retry, testId } = parseResultId(resultId)
-  const match = failingTests.find(
-    (ft) => ft.test.testId === testId && ft.result.retry === retry,
-  )
+  const match = failingTests.find((ft) => ft.test.testId === testId && ft.result.retry === retry)
   if (!match) {
     fail(`No failing test result found for result ID: "${resultId}"`)
   }
@@ -172,11 +165,7 @@ async function getTraces(parser: PlaywrightReportParser, resultId: string) {
   output(data)
 }
 
-async function getScreenshots(
-  parser: PlaywrightReportParser,
-  resultId: string,
-  outputDir: string,
-) {
+async function getScreenshots(parser: PlaywrightReportParser, resultId: string, outputDir: string) {
   const report = parser.getReport()
   const { result } = findResult(parser.getFailingTests(report), resultId)
   const screenshots = parser.getScreenshots(result)
@@ -203,10 +192,7 @@ async function getScreenshots(
   output(data)
 }
 
-async function getErrorContext(
-  parser: PlaywrightReportParser,
-  resultId: string,
-) {
+async function getErrorContext(parser: PlaywrightReportParser, resultId: string) {
   const report = parser.getReport()
   const { result } = findResult(parser.getFailingTests(report), resultId)
   const errorContext = parser.getErrorContext(result)
@@ -220,8 +206,7 @@ async function getErrorContext(
   }
 
   const isText =
-    errorContext.contentType.startsWith('text/') ||
-    errorContext.contentType.includes('markdown')
+    errorContext.contentType.startsWith('text/') || errorContext.contentType.includes('markdown')
 
   const data: ErrorContextOutput = {
     content: isText ? buffer.toString('utf-8') : buffer.toString('base64'),
@@ -236,9 +221,9 @@ async function main() {
   const { positionals, values } = parseArgs({
     allowPositionals: true,
     options: {
-      help: { default: false, type: 'boolean' },
-      output: { default: './screenshots', type: 'string' },
-      report: { type: 'string' },
+      'help': { default: false, type: 'boolean' },
+      'output': { default: './screenshots', type: 'string' },
+      'report': { type: 'string' },
       'result-id': { type: 'string' },
     },
     strict: true,
@@ -251,18 +236,14 @@ async function main() {
 
   const command = positionals[0] as string
   if (!COMMANDS.includes(command as Command)) {
-    fail(
-      `Unknown command: "${command}". Valid commands: ${COMMANDS.join(', ')}`,
-    )
+    fail(`Unknown command: "${command}". Valid commands: ${COMMANDS.join(', ')}`)
   }
 
   if (!values.report) {
     fail('Missing required option: --report <path>')
   }
 
-  const parser = await PlaywrightReportParser.parse(
-    resolveReportPath(values.report),
-  )
+  const parser = await PlaywrightReportParser.parse(resolveReportPath(values.report))
 
   switch (command as Command) {
     case 'get-stats':
@@ -274,11 +255,7 @@ async function main() {
     case 'get-traces':
       return getTraces(parser, requireResultId(values['result-id']))
     case 'get-screenshots':
-      return getScreenshots(
-        parser,
-        requireResultId(values['result-id']),
-        values.output!,
-      )
+      return getScreenshots(parser, requireResultId(values['result-id']), values.output!)
     case 'get-error-context':
       return getErrorContext(parser, requireResultId(values['result-id']))
   }

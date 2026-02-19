@@ -26,9 +26,7 @@ npm install playwright-report-parser
 ```typescript
 import { PlaywrightReportParser } from 'playwright-report-parser'
 
-const parser = await PlaywrightReportParser.parse(
-  'playwright-report/index.html',
-)
+const parser = await PlaywrightReportParser.parse('playwright-report/index.html')
 
 const report = parser.getReport()
 console.log(`Total: ${report.stats.total}`)

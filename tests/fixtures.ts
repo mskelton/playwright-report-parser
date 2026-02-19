@@ -1,8 +1,8 @@
+import * as fs from 'fs/promises'
+import * as path from 'path'
 import { test as base } from '@playwright/test'
 import type { JSONReport } from '@playwright/test/reporter'
 import { execa } from 'execa'
-import * as fs from 'fs/promises'
-import * as path from 'path'
 
 type Files = {
   [key: string]: string
@@ -41,20 +41,14 @@ function stripAnsi(str: string): string {
 async function writeFiles(baseDir: string, files: Files): Promise<void> {
   let filesToWrite = { ...files }
 
-  if (
-    !Object.keys(filesToWrite).some((name) => name.includes('package.json'))
-  ) {
+  if (!Object.keys(filesToWrite).some((name) => name.includes('package.json'))) {
     filesToWrite = {
       ...filesToWrite,
       'package.json': JSON.stringify({ name: 'test-project', type: 'module' }),
     }
   }
 
-  if (
-    !Object.keys(filesToWrite).some((name) =>
-      name.includes('playwright.config'),
-    )
-  ) {
+  if (!Object.keys(filesToWrite).some((name) => name.includes('playwright.config'))) {
     filesToWrite = {
       ...filesToWrite,
       'playwright.config.ts': `
@@ -87,7 +81,7 @@ function toParamList(params: Params): string[] {
   for (const key of Object.keys(params)) {
     const values = Array.isArray(params[key]) ? params[key] : [params[key]]
     for (const value of values) {
-      const k = key.startsWith('-') ? key : `--${  key}`
+      const k = key.startsWith('-') ? key : `--${key}`
       paramList.push(params[key] === true ? k : `${k}=${value}`)
     }
   }
@@ -119,10 +113,7 @@ function parseTestRunnerOutput(output: string) {
   }
 }
 
-async function runPlaywrightTest(
-  baseDir: string,
-  params: Params,
-): Promise<RunResult> {
+async function runPlaywrightTest(baseDir: string, params: Params): Promise<RunResult> {
   const paramList = toParamList(params)
   const args = ['test', '--workers=2', ...paramList]
 

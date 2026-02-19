@@ -1,9 +1,14 @@
-import { execa } from 'execa'
 import * as fs from 'fs/promises'
-import assert from 'node:assert';
+import assert from 'node:assert'
 import { fileURLToPath } from 'node:url'
 import * as path from 'path'
-import type { FailureOutput,FileOutput,ScreenshotsOutput,TracesOutput } from '../src/types/index.js'
+import { execa } from 'execa'
+import type {
+  FailureOutput,
+  FileOutput,
+  ScreenshotsOutput,
+  TracesOutput,
+} from '../src/types/index.js'
 import { expect, test } from './fixtures.js'
 
 const CLI_PATH = fileURLToPath(new URL('./../dist/cli.js', import.meta.url))
@@ -38,7 +43,7 @@ test.describe('help and errors', () => {
 
 test.describe('get-stats', () => {
   test('returns report statistics', async ({ runInlineTest }) => {
-    const {exitCode,reportPath} = await runInlineTest({
+    const { exitCode, reportPath } = await runInlineTest({
       'a.test.ts': `
         import { test, expect } from '@playwright/test';
         test('passing test', async () => { expect(1).toBe(1); });
@@ -66,7 +71,7 @@ test.describe('get-stats', () => {
   })
 
   test('resolves directory path', async ({ runInlineTest }) => {
-    const {exitCode,reportPath} = await runInlineTest({
+    const { exitCode, reportPath } = await runInlineTest({
       'a.test.ts': `
         import { test, expect } from '@playwright/test';
         test('passing test', async () => { expect(1).toBe(1); });
@@ -112,9 +117,7 @@ test.describe('get-files', () => {
     expect(result.exitCode).toBe(0)
     assert.ok(result.json)
 
-    const sorted = [...result.json].sort((a, b) =>
-      a.fileName.localeCompare(b.fileName),
-    )
+    const sorted = [...result.json].sort((a, b) => a.fileName.localeCompare(b.fileName))
     expect(sorted).toStrictEqual([
       {
         fileId: expect.any(String),
@@ -200,9 +203,7 @@ test.describe('get-failures', () => {
 })
 
 test.describe('get-traces', () => {
-  test('returns trace events for a failing test', async ({
-    runInlineTest,
-  }) => {
+  test('returns trace events for a failing test', async ({ runInlineTest }) => {
     const { exitCode, reportPath } = await runInlineTest({
       'a.test.ts': `
         import { test, expect } from '@playwright/test';
@@ -237,7 +238,7 @@ test.describe('get-traces', () => {
   })
 
   test('errors when --result-id is missing', async ({ runInlineTest }) => {
-    const {exitCode,reportPath} = await runInlineTest({
+    const { exitCode, reportPath } = await runInlineTest({
       'a.test.ts': `
         import { test, expect } from '@playwright/test';
         test('failing test', async () => { expect(1).toBe(2); });
@@ -253,7 +254,7 @@ test.describe('get-traces', () => {
 
 test.describe('get-screenshots', () => {
   test('saves screenshots to disk', async ({ runInlineTest }) => {
-    const {exitCode,reportPath} = await runInlineTest({
+    const { exitCode, reportPath } = await runInlineTest({
       'a.test.ts': `
         import { test, expect } from '@playwright/test';
         test('screenshot test', async ({ page }) => {
@@ -268,11 +269,7 @@ test.describe('get-screenshots', () => {
     const resultId = failures.json?.[0].resultId
     assert.ok(resultId)
 
-    const outputDir = path.join(
-      path.dirname(reportPath),
-      '..',
-      'cli-screenshots',
-    )
+    const outputDir = path.join(path.dirname(reportPath), '..', 'cli-screenshots')
 
     const result = await run<ScreenshotsOutput>(
       'get-screenshots',
@@ -303,7 +300,7 @@ test.describe('get-screenshots', () => {
 
 test.describe('get-error-context', () => {
   test('returns error context', async ({ runInlineTest }) => {
-    const {exitCode,reportPath} = await runInlineTest({
+    const { exitCode, reportPath } = await runInlineTest({
       'a.test.ts': `
         import { test, expect } from '@playwright/test';
         test('error context test', async ({ page }) => {
@@ -318,13 +315,7 @@ test.describe('get-error-context', () => {
     const resultId = failures.json?.[0].resultId
     assert.ok(resultId)
 
-    const result = await run(
-      'get-error-context',
-      '--report',
-      reportPath,
-      '--result-id',
-      resultId,
-    )
+    const result = await run('get-error-context', '--report', reportPath, '--result-id', resultId)
     expect(result.exitCode).toBe(0)
     expect(result.json).toStrictEqual({
       content: expect.stringContaining('Error Context Test'),
@@ -351,7 +342,6 @@ async function run<T = unknown>(...args: string[]) {
     stdout: result.stdout,
   }
 }
-
 
 function safeParseJson<T>(json: string): T | null {
   try {

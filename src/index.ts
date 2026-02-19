@@ -1,6 +1,6 @@
-import AdmZip from 'adm-zip'
 import { readFile } from 'fs/promises'
 import { dirname, join } from 'node:path'
+import AdmZip from 'adm-zip'
 import type {
   FailingTest,
   FileInfo,
@@ -28,9 +28,7 @@ export class PlaywrightReportParser {
   async #extractZipData(): Promise<void> {
     const html = await readFile(this.#htmlPath, 'utf-8')
 
-    const script = html.match(
-      /<script id="playwrightReportBase64"[^>]*>(.*?)<\/script>/s,
-    )
+    const script = html.match(/<script id="playwrightReportBase64"[^>]*>(.*?)<\/script>/s)
 
     const scriptContent = script ? script[1].trim() : null
     if (!scriptContent) {
@@ -108,9 +106,7 @@ export class PlaywrightReportParser {
   }
 
   getScreenshots(result: TestResult): LazyTestAttachment[] {
-    return this.#getAttachments(result).filter(
-      (attachment) => attachment.name === 'screenshot',
-    )
+    return this.#getAttachments(result).filter((attachment) => attachment.name === 'screenshot')
   }
 
   getErrorContext(result: TestResult): LazyTestAttachment | null {

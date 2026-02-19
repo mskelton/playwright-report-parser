@@ -1,30 +1,29 @@
 {
   "name": "playwright-report-parser",
-  "description": "A lightweight TypeScript library to programmatically parse and analyze Playwright HTML test reports.",
   "version": "0.0.0-semantically-released",
-  "repository": "https://github.com/mskelton/playwright-report-parser",
-  "author": "Mark Skelton <mark@mskelton.dev>",
+  "description": "A lightweight TypeScript library to programmatically parse and analyze Playwright HTML test reports.",
   "license": "ISC",
-  "publishConfig": {
-    "access": "public"
-  },
-  "packageManager": "yarn@4.12.0",
-  "type": "module",
+  "author": "Mark Skelton <mark@mskelton.dev>",
+  "repository": "https://github.com/mskelton/playwright-report-parser",
   "bin": "./dist/cli.js",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
   "files": [
     "dist"
   ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write .",
+    "format": "oxfmt .",
     "lint": "eslint .",
-    "format:check": "prettier --check .",
+    "format:check": "oxfmt --check .",
     "typecheck": "tsc --noEmit",
     "test": "playwright test"
   },
@@ -39,8 +38,9 @@
     "dedent": "^1.7.1",
     "eslint": "^10.0.0",
     "execa": "^9.5.2",
-    "prettier": "^3.6.2",
+    "oxfmt": "^0.33.0",
     "semantic-release": "^25.0.2",
     "typescript": "^5.6.3"
-  }
+  },
+  "packageManager": "yarn@4.12.0"
 }

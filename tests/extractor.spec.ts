@@ -1,5 +1,5 @@
-import dedent from 'dedent'
 import { stripVTControlCharacters } from 'node:util'
+import dedent from 'dedent'
 import { PlaywrightReportParser } from '../src/index.js'
 import { StdioTraceEvent } from '../src/types/trace.js'
 import { expect, test } from './fixtures.js'
@@ -49,10 +49,7 @@ test('extracts file structure', async ({ runInlineTest }) => {
   const report = parser.getReport()
 
   expect(report.files).toHaveLength(2)
-  expect(report.files.map((f) => f.fileName).sort()).toEqual([
-    'a.test.ts',
-    'b.test.ts',
-  ])
+  expect(report.files.map((f) => f.fileName).sort()).toEqual(['a.test.ts', 'b.test.ts'])
 })
 
 test('extracts failing tests', async ({ runInlineTest }) => {
@@ -306,16 +303,12 @@ test('extracts trace actions', async ({ runInlineTest }) => {
   expect(beforeEvents.length).toBeGreaterThan(0)
 
   await test.step('extracts click action', async () => {
-    const clickAction = beforeEvents.find((e) =>
-      e.title?.toLowerCase().includes('locator'),
-    )
+    const clickAction = beforeEvents.find((e) => e.title?.toLowerCase().includes('locator'))
     expect(clickAction).toBeDefined()
   })
 
   await test.step('extracts toHaveText action', async () => {
-    const expectAction = beforeEvents.find((e) =>
-      e.title?.includes('toHaveText'),
-    )
+    const expectAction = beforeEvents.find((e) => e.title?.includes('toHaveText'))
     expect(expectAction).toBeDefined()
   })
 
@@ -324,9 +317,7 @@ test('extracts trace actions', async ({ runInlineTest }) => {
       (event): event is StdioTraceEvent => event.type === 'stdout',
     )
     expect(stdoutEvents.length).toBeGreaterThan(0)
-    const outputMessage = stdoutEvents.find((e) =>
-      e.text?.includes('test output message'),
-    )
+    const outputMessage = stdoutEvents.find((e) => e.text?.includes('test output message'))
     expect(outputMessage).toBeDefined()
   })
 })

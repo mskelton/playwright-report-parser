@@ -1,20 +1,25 @@
-import mskelton from "@mskelton/eslint-config"
+import mskelton from '@mskelton/eslint-config'
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  { ignores: ["dist/", "examples/", "test-results/"] },
+  { ignores: ['dist/', 'examples/', 'test-results/'] },
   ...mskelton.recommended,
   {
-    ...mskelton.playwright,
-    files: ["tests/**/*.spec.ts"],
     rules: {
-      'playwright/require-top-level-describe': 'off',
-    }
+      'sort/imports': 'off',
+    },
   },
   {
-    files: ["tests/**/*.ts"],
+    ...mskelton.playwright,
+    files: ['tests/**/*.spec.ts'],
+    rules: {
+      'playwright/require-top-level-describe': 'off',
+    },
+  },
+  {
+    files: ['tests/**/*.ts'],
     rules: {
       'no-empty-pattern': 'off',
-    }
-  }
+    },
+  },
 ]
